@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -11,7 +12,16 @@ class LoginController extends Controller
         return view('login_social');
     }
     protected function registerOrLoginUser($data){
-
+        $user = User::where('email',$data->email)->first();
+        if(!$user){
+           $user = new User();
+           $user->name = $data->name;
+           $user->email = $data->email;
+           $user->provider_id = $data->id;
+           $user->avatar = $data->avatar;
+           $user->save();
+        }
+        Auth::login($user);
     }
     //Google Login
     public function redirectToGoogle(){
